@@ -1,0 +1,61 @@
+{% extends "layout.html" %}
+{% block content %}
+
+
+	<div class="panel panel-body">
+		<section>
+			<h3>Welcome to Entertainment Crossing!</h3>
+			<p>
+				 Use this site to find the career overlap of two entertainers, according to their imdb pages.
+			</p>
+			<p><strong>Please Note: </strong></p>
+			<p>A) This comparison will only work if each input finds a corresponding imdb page</p>
+			<p>
+				B) This process performs a google search, then scrapes each imdb page respectively and compares them, which <em>takes time</em>. Please allow 10 seconds before trying again. It's working, I promise.
+			</p>
+		</section>
+		<form method="POST" action="">
+			{{ form.hidden_tag() }}
+			<fieldset class="form-group">
+				<legend class="border-bottom mb-4">Enter the Entertainers</legend>
+				<div class="form-group">
+					{{ form.entertainer1.label(class="form-control-label") }}
+
+					{% if form.entertainer1.errors %}
+						<div class="invalid-feedback is-invalid">
+							{% for error in form.entertainer1.errors %}
+								<span>{{ error }}</span>
+							{% endfor %}
+						</div>
+
+					{% else %}
+						{{ form.entertainer1(class="form-control form-control-lg") }}
+					{% endif %}
+				</div>
+				<div class="form-group">
+					{{ form.entertainer2.label(class="form-control-label") }}
+					{% if form.entertainer2.errors %}
+						<div class="invalid-feedback is-invalid">
+							{% for error in form.entertainer2.errors %}
+								<span>{{ error }}</span>
+							{% endfor %}
+						</div>
+
+					{% else %}
+						{{ form.entertainer2(class="form-control form-control-lg") }}
+					{% endif %}
+				</div>
+			</fieldset>
+			<div class="form-group">
+				{{ form.submit(class="btn btn-outline-info") }}
+			</div>
+		</form>
+
+		<footer class="footer mt-auto py-3">
+		  <div class="container">
+		    <span class="text-muted">Currently this site uses python's Beautiful Soup to pull each entertainer's entire imdb filmography to compare. Because of this, it cannot differentiate on certain items like 'Episode 2', etc. It also can't tell whether two entertainers worked on a project <em>simultaneously</em>. If you would like to add this functionality, please submit a pull request to the code HERE.</span>
+		  </div>
+		</footer>
+	</div>
+
+{% endblock content %}

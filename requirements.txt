@@ -1,0 +1,14 @@
+beautifulsoup4==4.7.1
+Click==7.0
+Flask==1.0.3
+Flask-WTF==0.14.2
+google==2.0.2
+google-api-python-client==1.7.7
+google-auth==1.6.2
+google-auth-httplib2==0.0.3
+itsdangerous==1.1.0
+Jinja2==2.10.1
+requests==2.21.0
+requests-oauthlib==1.0.0
+Werkzeug==0.15.4
+WTForms==2.2.1
