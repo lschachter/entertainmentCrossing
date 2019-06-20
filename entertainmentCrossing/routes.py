@@ -1,18 +1,30 @@
-from flask import render_template, flash, current_app
+from flask import (
+	render_template, redirect, url_for, 
+	flash, current_app, jsonify, request
+)
 from entertainmentCrossing.forms import EntertainerForm
 
 import entertainmentCrossing.imdbCompare
 
 @current_app.route('/', methods=['GET', 'POST'])
-def findOverlap():
-  form = EntertainerForm()
-  if form.validate_on_submit():
-  	entertainer1 = form.entertainer1.data
-  	entertainer2 = form.entertainer2.data
-  	flash(f'Finding the career overlap of {entertainer1} and {entertainer2}! Please allow 10 seconds before clicking again.', 'success')
-  	overlap = entertainmentCrossing.imdbCompare.run_queries(entertainer1, entertainer2)
-  	if "Error" in overlap:
-  		flash(f'{overlap}', 'error')
-  	else:
-  		flash(f'{overlap}', 'success')
-  return render_template('findOverlap.html', form=form)
+def see_crossing():
+	form = EntertainerForm()
+	if request.method == 'POST':
+		entertainer1 = request.form['entertainer1']
+		entertainer2 = request.form['entertainer2']
+		flash(f'Finding the career crossing of {entertainer1} and {entertainer2}...')
+		overlapSet = entertainmentCrossing.imdbCompare.run_queries(entertainer1, entertainer2)
+		if "Error" in overlapSet:
+			flash(f'{overlapSet}', 'error')
+			return None
+		else:
+			overlap = jsonify(
+				crossing=list(overlapSet),
+				entertainer1=entertainer1,
+				entertainer2=entertainer2
+				)
+			return overlap
+	return render_template('find_crossing.html', form=form, overlap=None)
+
+	
+	

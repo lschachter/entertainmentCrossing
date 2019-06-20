@@ -4,7 +4,7 @@ from bs4 import BeautifulSoup
 from googlesearch import search
 
 def get_title_dict(link):
-	response = requests.get(link, timeout=10)
+	response = requests.get(link, timeout=15)
 	content = BeautifulSoup(response.content, "html.parser")
 
 	filmography = content.find(id="filmography")
@@ -26,23 +26,27 @@ def compare_filmographies(link_1, link_2):
 
 
 def getURL(query):
-	# return the first url that google finds 
-	for i in search(query, tld="com", num=1, stop=1, pause=2.0):
-		return i
+	# return the first imdb url that google finds 
+	for url in search(query, tld="com", num=10, stop=10, pause=2.0):
+		if "imdb" in url:
+			return url
+	return None
+
 
 
 def run_queries(query1, query2):
 	link1 = getURL(query1)
 	link2 = getURL(query2)
 
-	if "imdb" not in link1:
+	if link1 is None:
 		return f'Error: {query1} did not yield an imdb page to search. Please try again.'
-	elif "imdb" not in link2:
+	elif link2 is None:
 		return f'Error: {query2} did not yield an imdb page to search. Please try again.'
 
 	return compare_filmographies(link1, link2)
 
 
 
-#print(run_queries("Johnny Depp", "Tim Burton"))
+if __name__ == "__main__":
+	print(run_queries("george clooney", "brad pitt"))
 
