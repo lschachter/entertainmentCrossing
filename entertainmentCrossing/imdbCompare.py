@@ -8,7 +8,7 @@ def get_title_dict(link):
 	content = BeautifulSoup(response.content, "html.parser")
 
 	filmography = content.find(id="filmography")
-	titles_pattern = "/title/.*" 
+	titles_pattern = "/title/.*"
 
 	titles = filmography.findAll('a', attrs={"href":re.compile(titles_pattern)})
 	title_dict = {a.text: a.get('href') for a in titles}

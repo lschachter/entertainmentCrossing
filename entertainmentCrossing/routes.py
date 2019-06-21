@@ -12,11 +12,10 @@ def see_crossing():
 	if request.method == 'POST':
 		entertainer1 = request.form['entertainer1']
 		entertainer2 = request.form['entertainer2']
-		flash(f'Finding the career crossing of {entertainer1} and {entertainer2}...')
+		flash(f'Finding the career crossing of {entertainer1} and {entertainer2}...', 'success')
 		overlapSet = entertainmentCrossing.imdbCompare.run_queries(entertainer1, entertainer2)
-		if "Error" in overlapSet:
-			flash(f'{overlapSet}', 'error')
-			return None
+		if type(overlapSet) == str:
+			flash(f'{overlapSet}', 'danger')	
 		else:
 			overlap = jsonify(
 				crossing=list(overlapSet),
@@ -24,7 +23,7 @@ def see_crossing():
 				entertainer2=entertainer2
 				)
 			return overlap
-	return render_template('find_crossing.html', form=form, overlap=None)
+	return render_template('find_crossing.html', form=form)
 
 	
 	

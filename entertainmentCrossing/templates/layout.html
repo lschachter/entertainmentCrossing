@@ -6,9 +6,10 @@
   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 
   <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" rel="stylesheet">
+  <link rel= "stylesheet" type= "text/css" href= "{{ url_for('static',filename='css/find_crossing.css') }}">
   
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
-  <script src="static/js/find_crossing.js"></script>
+  
 
 </head>
 <body>
@@ -21,7 +22,7 @@
 		{% with messages = get_flashed_messages(with_categories=true) %}
 			{% if messages %}
 				{% for category, message in messages %}
-					<div class="alert alert-{{ category }} {{ category }}">
+					<div class="alert alert-{{ category }}">
 						{{ message }}
 					</div>
 				{% endfor %}
@@ -33,5 +34,6 @@
 		</div>
 	</main>
 
+	<script type="text/javascript" src="{{ url_for('static', filename='js/find_crossing.js') }}"></script>
 </body>
 </html>

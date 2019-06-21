@@ -14,7 +14,7 @@
 				B) This process performs a google search, then scrapes each imdb page respectively and compares them, which <em>takes time</em>. Please allow 10 seconds before trying again. It's working, I promise.
 			</p>
 		</section>
-		<form id="enter-tainers" method="POST" action="">
+		<form id="enter-tainers">
 			{{ form.hidden_tag() }}
 			<fieldset class="form-group">
 				<legend class="border-bottom mb-4">Enter the Entertainers</legend>
@@ -52,18 +52,14 @@
 		</form>
 
 		{% block results %}
-			{% if overlap %}
-				<div>
-					<h3>Results--</h3>
-					<h4>{{ overlap['entertainer1'] }} and {{ overlap['entertainer2'] }} both worked on: </h4> 
-					{% for project in overlap['crossing'] %}
-						<li>{{ project }}</li>
-					{% endfor %}
+			<div class="results">
+				<h3>Results--</h3>
+				<h4> </h4> 
 
-					<p>ajax results:</p>
-					<p id="results"></p>
-				</div>
-			{% endif %}
+				<p>ajax results:</p>
+				<p id="results"></p>
+			</div>
+
 		{% endblock results %}
 
 		<footer class="footer mt-auto py-3">
