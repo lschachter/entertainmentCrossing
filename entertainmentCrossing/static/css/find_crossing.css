@@ -1,14 +1,25 @@
+
+body a {
+	color: #17a2b8;
+}
+
+body a:hover {
+	color: #008799;
+}
+
 .results-section {
 	display: none;
 }
 
 .processing-overlay {
 	background-color: #e9e9e9;
+	border-radius: 20px;
 	display: none;
 	position: absolute;
 	top: 5%;
 	bottom: 5%;
 	left: 5%;
 	right: 5%;
-	opacity: 0.5;
+	opacity: 0.9;
+	
 }

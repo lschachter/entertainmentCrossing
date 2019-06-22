@@ -3,7 +3,6 @@ from flask import (
 	flash, current_app, jsonify, request
 )
 from entertainmentCrossing.forms import EntertainerForm
-
 import entertainmentCrossing.imdbCompare
 
 @current_app.route('/', methods=['POST'])

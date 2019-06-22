@@ -21,7 +21,6 @@ def compare_filmographies(link_1, link_2):
 	title_dict_2 = get_title_dict(link_2)
 
 	both_in_titles = set(title_dict_1) & set(title_dict_2)
-
 	both_in_dict = { title: title_dict_1[title] for title in both_in_titles}
 
 	return both_in_dict

@@ -1,16 +1,17 @@
 {% extends "layout.html" %}
 {% block content %}
 
-	<div class="processing-overlay">
+	<div class="processing-overlay text-center align-middle">
 		<h3>Processing, please wait</h3>
-
+		<progress value="0" max="15" id="progress-bar"></progress>
 	</div>
+	
 	<section>
 		<h3>Welcome to Entertainment Crossing!</h3>
 		<p>
 			 Use this site to find the career overlap of two entertainers, according to their imdb pages.
 	</section>
-	<form id="enter-tainers">
+	<form id="enter-tainers" onsubmit="return show_overlay()">
 		{{ form.hidden_tag() }}
 		<fieldset class="form-group">
 			<legend class="border-bottom mb-4">Enter the Entertainers</legend>
@@ -49,9 +50,9 @@
 
 	<div id="results-section" class="results-section card bg-light text-dark">
 		
-		<div class="card-body text-center">
+		<div class="card-body">
 			<h3 id="results-insert-hook">Results</h3>
-			<ul id="results" class="row"></ul>
+			<ul id="results" class="row no-gutters"></ul>
 		</div>
 	</div>
 
