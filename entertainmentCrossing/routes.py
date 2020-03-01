@@ -7,23 +7,22 @@ import entertainmentCrossing.imdbCompare
 
 @current_app.route('/', methods=['POST'])
 def see_crossing():
-	entertainer1 = request.form['entertainer1']
-	entertainer2 = request.form['entertainer2']
-	flash(f'Finding the career crossing of {entertainer1} and {entertainer2}...', 'success')
-	overlap_dict = entertainmentCrossing.imdbCompare.run_queries(entertainer1, entertainer2)
-	if type(overlap_dict) == str:
-		flash(f'{overlap_dict}', 'danger')	
-	else:
-		overlap = jsonify(
-			crossing=overlap_dict,
-			e1=entertainer1,
-			e2=entertainer2
-			)
+	try:
+		entertainer1 = request.form['entertainer1']
+		entertainer2 = request.form['entertainer2']
+		overlap_dict = entertainmentCrossing.imdbCompare.run_queries(entertainer1, entertainer2)
+		if overlap_dict.get('error_msg'):
+			overlap_dict["success"] = 0
+		else:
+			overlap_dict["success"] = 1
+		overlap = jsonify(overlap_dict)
 		return overlap
+	except Exception as e:
+		return jsonify(success=0, error_msg=str(e))
 	
-
 	
 @current_app.route('/', methods=['GET'])
 def index():
 	form = EntertainerForm()
 	return render_template('find_crossing.html', form=form)
+	

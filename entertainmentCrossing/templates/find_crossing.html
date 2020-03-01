@@ -2,14 +2,14 @@
 {% block content %}
 
 	<div class="processing-overlay text-center align-middle">
-		<h3>Processing, please wait</h3>
-		<progress value="0" max="15" id="progress-bar"></progress>
+		<h3 class="processing-text">Processing, please wait</h3>
+		<progress value="0" max="10" id="progress-bar"></progress>
 	</div>
-	
+
 	<section>
 		<h3>Welcome to Entertainment Crossing!</h3>
 		<p>
-			 Use this site to find the career overlap of two entertainers, according to their imdb pages.
+			 Use this site to find the career overlap of two entertainers, according to their IMDb pages.
 	</section>
 	<form id="enter-tainers" onsubmit="return show_overlay()">
 		{{ form.hidden_tag() }}
@@ -58,7 +58,7 @@
 
 	<footer class="footer mt-auto py-3">
 	  <div class="container">
-	    <span class="text-muted">Currently this site uses python's Beautiful Soup to pull each entertainer's entire imdb filmography to compare. Because of this, it cannot differentiate on certain items like 'Episode 2', etc. It also can't tell whether two entertainers worked on a project <em>simultaneously</em>. If you would like to add this functionality, please submit a pull request to the code <a href="https://github.com/lschachter/entertainmentCrossing">HERE</a>.</span>
+	    <span class="text-muted">Currently this site uses python's Beautiful Soup to pull each entertainer's entire imdb filmography to compare. Because of this, it can't tell whether two entertainers worked on a project <em>simultaneously</em>. If you would like to add this functionality, please submit a pull request to the code <a target="_blank" href="https://github.com/lschachter/entertainmentCrossing">HERE</a>.</span>
 	  </div>
 	</footer>
 

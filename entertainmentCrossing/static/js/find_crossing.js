@@ -6,15 +6,24 @@ $(function() {
 	  	data: $('form').serialize(),
 	  	success: function(response) {
 	  		$(".processing-overlay").hide();
+	  		$('#results').empty();	
 	  		$('.results-section').show();	
-	  		var imdb = "https://www.imdb.com/";
-	  		$('#results-insert-hook').after("<h6>" + response['e1'] + " and " + response['e2'] + " both worked on:</h6>");
-	  		$.each(response['crossing'], function(title, link) {
-	  			$('#results').append('<a class="col-sm-6" href="' + imdb + link + '">'+title+'</a>');
-	  		});  		
+	  		if (response['success'] == 0) {
+	  			console.log(response);
+	  			$('#results').append('<p>Sorry, ' + response['error_msg'] + '</p>');
+	  		} else {
+		  		var imdb = "https://www.imdb.com/";
+		  		var person1 = '<a target="_blank" href="' + response['e1'].url + '">' + response['e1'].name + '</a>'
+		  		var person2 = '<a target="_blank" href="' + response['e2'].url + '">' + response['e2'].name + '</a>'
+		  		$('#results-insert-hook').after("<h6>" + person1 + " and " + person2 + " both worked on:</h6>");
+		  		$.each(response['crossing'], function(link, title) {
+		  			$('#results').append('<a class="col-sm-6" target="_blank" href="' + imdb + link + '">' + title + '</a>');
+		  		});
+		  	}
 	  	},
 	  	error: function(error) {
 	  		console.log(error);
+	  		$('#results').append('<p>"Sorry, we ran into an error. Please try again: ' + error.error_msg + '</p>');
 	  	}
 	  })
 	});
@@ -34,4 +43,3 @@ function show_overlay() {
 	$(".processing-overlay").show();
 	countdown_clock();
 }
-
