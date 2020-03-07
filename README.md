@@ -1,6 +1,10 @@
 ## Entertainment Crossing
 
+![Entertainment Crossing Welcome](readme-pics/welcome.png)
+
 Entertainment Crossing is a single page web app built using Flask, jQuery, the Python library Beautiful Soup, and Google's Search API. Use it to discover what projects entertainers have worked on together, according to their IMDb pages. 
+
+![Entertainment Crossing Welcome](readme-pics/results.png)
 
 Once you clone this project, you will want to set up a [`virtual environment`](https://docs.python-guide.org/dev/virtualenvs/). I use `virtualenv` here, which, once installed, can be added to the project via the terminal using 
 
