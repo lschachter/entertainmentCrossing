@@ -5,121 +5,86 @@ from googlesearch import search
 
 
 class ComparePages:
-	def __init__(self, queries):
-		self.queries = queries
+	'''
+	ComparePages will take multiple queries and search for the IMDb pages most related to them. If it successfully finds overlap in the filmographies found on those IMDb pages, it will return that overlap. Otherwise it will return the relevant error.
+	'''
+	def __init__(self, names={}):
+		self.entertainers = { name: "" for name in names }
+		self.error_dict = {}
+		self.title_dicts = []
 
-	def run_queries(self):
-		self.links = []
 
-		for query in self.queries:
-			link = self.get_url(query)
-			if not link:
-				return {"error_msg": f'{query} did not yield an individual\'s imdb page to search. Please try again.'}
-			self.links.append(link)
+	def run_queries(self, names):
+		self.entertainers = { name: "" for name in names }
+		for name in self.entertainers:
+			self.entertainers[name] = self.get_url(name)
 
-		intersections = self.compare_filmographies()
+		if self.error_dict: return self.error_dict
+		self.intersect = self.compare_filmographies()
+		if self.error_dict: return self.error_dict
+
+		output = self.build_output_dict()
+		return output
 
 
 	def get_url(self, query):
-		# return the first imdb url that google finds 
+		'''
+		Use Google's search API to return the first imdb url found
+		'''
 		for url in search(query, tld="com", num=10, stop=10, pause=1.0):
 			if "imdb" in url and "name" in url:
 				return url
-		return None
+		self.error_dict = {"error_msg": f'{query} did not yield an individual\'s imdb page to search. Please try again.'}
+		return ""
 
 
 	def compare_filmographies(self):
-		self.title_dicts = []
+		'''
+		Get and compare the filmographies of each entertainer entered
+		'''
+		for name in self.entertainers:
+			self.title_dicts.append(self.get_title_dict(name, self.entertainers[name]))
 
-		for link in self.links:
-			title_dict = self.get_title_dict(link)
-			if title_dict.get('error_msg'):
-				return title_dict
-
-		return set.intersection(*self.title_dicts)
+		intersect_set = set.intersection(*map(set, self.title_dicts))
+		intersect_dict = { title: self.title_dicts[0][title] for title in intersect_set }
+		return intersect_dict
 
 
-	def get_title_dict(self, link):
+	def get_title_dict(self, name, link):
+		'''
+		Use the `requests` and `BeautifulSoup` libraries to scrape the given IMDb page for a filmography section.
+		Use the `re` library to search the scraped content for the regular expression that points to the title section. 
+		'''
 		response = requests.get(link, timeout=15)
 		content = BeautifulSoup(response.content, "html.parser")
 
 		filmography = content.find(id="filmography")
 		if not filmography:
-			return {"error_msg": f'the page <a href="{link}" target="_blank">{link}</a> did not yield a filmography to search. Please try again.'}
+			self.error_dict = {"error_msg": f'the IMDb page <a href="{link}" target="_blank">{name}</a> did not yield a filmography to search. Please try again.'}
+			return None
 
 		titles_pattern = "/title/.*"
-
 		titles = filmography.find_all('a', attrs={"href":re.compile(titles_pattern)})
 		title_dict = {a.get('href'): a.text for a in titles}
-
 		return title_dict
 
 
-def get_title_dict(link):
-	response = requests.get(link, timeout=15)
-	content = BeautifulSoup(response.content, "html.parser")
+	def build_output_dict(self):
+		output = {"crossing": self.intersect}
 
-	filmography = content.find(id="filmography")
-	if not filmography:
-		return {"error_msg": f'the page <a href="{link}" target="_blank">{link}</a> did not yield a filmography to search. Please try again.'}
+		for i, name in enumerate(self.entertainers):
+			key = "e" + str(i + 1)
+			output[key] = { "name": name, "url": self.entertainers[name] }
 
-	titles_pattern = "/title/.*"
-
-	titles = filmography.find_all('a', attrs={"href":re.compile(titles_pattern)})
-	title_dict = {a.get('href'): a.text for a in titles}
-
-	return title_dict
-
-
-def compare_filmographies(link_1, link_2):
-	title_dict_1 = get_title_dict(link_1)
-	title_dict_2 = get_title_dict(link_2)
-
-	if title_dict_1.get('error_msg'):
-		return title_dict_1
-	if title_dict_2.get('error_msg'):
-		return title_dict_2
-
-	both_in_titles = set(title_dict_1) & set(title_dict_2)
-	both_in_dict = { title: title_dict_1[title] for title in both_in_titles}
-
-	return both_in_dict
-
-
-def getURL(query):
-	# return the first imdb url that google finds 
-	for url in search(query, tld="com", num=10, stop=10, pause=1.0):
-		if "imdb" in url:
-			return url
-	return None
-
-
-
-def run_queries(query1, query2):
-	link1 = getURL(query1 + " imdb")
-	link2 = getURL(query2 + " imdb")
-
-	if not link1:
-		return {"error_msg": f'{query1} did not yield an imdb page to search. Please try again.'}
-	if not link2:
-		return {"error_msg": f'{query2} did not yield an imdb page to search. Please try again.'}
-
-	both_in = compare_filmographies(link1, link2)
-	if both_in.get('error_msg'):
-		return both_in
-
-	return {
-		"crossing": both_in,
-		"e1": {
-			"name": query1,
-			"url": link1
-		},
-		"e2": {
-			"name": query2,
-			"url": link2
-		}
-	}
+		return output
 
 
 if __name__ == "__main__":
-	print(run_queries("cate blanchett", "elijah wood"))
+	cp = ComparePages()
+	output = cp.run_queries(["cate blanchett", "elijah wood", "sean bean"])
+	print('crossing: ')
+	for item in output['crossing']:
+		print(item, output['crossing'][item])
+	print(output['e1'])
+	print(output['e2'])
+	print(output['e3'])

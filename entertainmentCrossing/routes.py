@@ -10,7 +10,8 @@ def see_crossing():
 	try:
 		entertainer1 = request.form['entertainer1']
 		entertainer2 = request.form['entertainer2']
-		overlap_dict = entertainmentCrossing.imdbCompare.run_queries(entertainer1, entertainer2)
+		compare_pages = entertainmentCrossing.imdbCompare.ComparePages()
+		overlap_dict = compare_pages.run_queries([entertainer1, entertainer2])
 		if overlap_dict.get('error_msg'):
 			overlap_dict["success"] = 0
 		else:
