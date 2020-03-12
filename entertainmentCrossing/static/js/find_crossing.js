@@ -1,24 +1,24 @@
 $(function() {
-	$( "#enter-tainers" ).submit(function( event ) {
+	$("#enter-tainers").submit(function( event ) {
 		event.preventDefault();
 	  $.post({
 	  	url: '/',
 	  	data: $('form').serialize(),
 	  	success: function(response) {
-	  		$(".processing-overlay").hide();
-	  		$('#results').empty();	
-	  		$('.results-section').show();	
-	  		if (response['success'] == 0) {
+			$(".processing-overlay").hide();
+			$("#results").empty();
+	  		$(".results-section").show();	
+	  		if (response['success'] === 0) {
 	  			console.log(response);
 	  			$('#results').append('<p>Sorry, ' + response['error_msg'] + '</p>');
 	  		} else {
 		  		var imdb = "https://www.imdb.com/";
 		  		var person1 = '<a target="_blank" href="' + response['e1'].url + '">' + response['e1'].name + '</a>'
 		  		var person2 = '<a target="_blank" href="' + response['e2'].url + '">' + response['e2'].name + '</a>'
-		  		$('#results-insert-hook').after("<h6>" + person1 + " and " + person2 + " both worked on:</h6>");
+				$('#entertainer-links').html(person1 + " and " + person2 + " both worked on:");
 		  		$.each(response['crossing'], function(link, title) {
 		  			$('#results').append('<a class="col-sm-6" target="_blank" href="' + imdb + link + '">' + title + '</a>');
-		  		});
+				});
 		  	}
 	  	},
 	  	error: function(error) {
