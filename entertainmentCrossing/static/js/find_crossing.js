@@ -12,12 +12,23 @@ $(function() {
 	  			console.log(response);
 	  			$('#results').append('<p>Sorry, ' + response['error_msg'] + '</p>');
 	  		} else {
-		  		var imdb = "https://www.imdb.com/";
-		  		var person1 = '<a target="_blank" href="' + response['e1'].url + '">' + response['e1'].name + '</a>'
-		  		var person2 = '<a target="_blank" href="' + response['e2'].url + '">' + response['e2'].name + '</a>'
-				$('#entertainer-links').html(person1 + " and " + person2 + " both worked on:");
-		  		$.each(response['crossing'], function(link, title) {
-		  			$('#results').append('<a class="col-sm-6" target="_blank" href="' + imdb + link + '">' + title + '</a>');
+				let people = '';
+				const numNames = response.entertainers.length;
+				console.log(numNames);
+				for (const [i, dict] of response.entertainers.entries()) {
+					const person = '<a target="_blank" href="' + dict.url  + '">' + dict.name + '</a>';
+					if (i !== numNames - 1)
+						people += person + ', ';
+					else {
+						const nameStrLen = people.length;
+						people = people.slice(0, nameStrLen - 2);
+						people += ' and ' + person + " worked on:";
+					}
+				}
+				$('#entertainer-links').html(people);
+				const imdb = "https://www.imdb.com/";
+		  		$.each(response['crossing'], function(url, title) {
+		  			$('#results').append('<a class="col-sm-6" target="_blank" href="' + imdb + url + '">' + title + '</a>');
 				});
 		  	}
 	  	},

@@ -31,7 +31,8 @@ class ComparePages:
 		'''
 		Use Google's search API to return the first imdb url found
 		'''
-		for url in search(query, tld="com", num=12, stop=12, pause=1.0):
+		query += " imdb"
+		for url in search(query, tld="com", num=10, stop=10, pause=1.0):
 			if "imdb" in url and "name" in url:
 				return url
 		self.error_dict = {"error_msg": f'{query} did not yield an individual\'s imdb page to search. Please try again.'}
@@ -46,7 +47,7 @@ class ComparePages:
 			self.title_dicts.append(self.get_title_dict(name, self.entertainers[name]))
 
 		intersect_set = set.intersection(*map(set, self.title_dicts))
-		intersect_dict = { title: self.title_dicts[0][title] for title in intersect_set }
+		intersect_dict = { link: self.title_dicts[0][link] for link in intersect_set }
 		return intersect_dict
 
 
@@ -65,16 +66,16 @@ class ComparePages:
 
 		titles_pattern = "/title/.*"
 		titles = filmography.find_all('a', attrs={"href":re.compile(titles_pattern)})
-		title_dict = {a.get('href'): a.text for a in titles}
+		title_dict = { a.get('href'): a.text for a in titles }
 		return title_dict
 
 
 	def build_output_dict(self):
 		output = {"crossing": self.intersect}
+		output["entertainers"] = []
 
 		for i, name in enumerate(self.entertainers):
-			key = "e" + str(i + 1)
-			output[key] = { "name": name, "url": self.entertainers[name] }
+			output["entertainers"].append({ "name": name, "url": self.entertainers[name] })
 
 		return output
 
@@ -85,6 +86,5 @@ if __name__ == "__main__":
 	print('crossing: ')
 	for item in output['crossing']:
 		print(item, output['crossing'][item])
-	print(output['e1'])
-	print(output['e2'])
-	print(output['e3'])
+	for name in output['entertainers']:
+		print(name, output['entertainers'][name])
