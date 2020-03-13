@@ -31,7 +31,7 @@ class ComparePages:
 		'''
 		Use Google's search API to return the first imdb url found
 		'''
-		for url in search(query, tld="com", num=10, stop=10, pause=1.0):
+		for url in search(query, tld="com", num=12, stop=12, pause=1.0):
 			if "imdb" in url and "name" in url:
 				return url
 		self.error_dict = {"error_msg": f'{query} did not yield an individual\'s imdb page to search. Please try again.'}

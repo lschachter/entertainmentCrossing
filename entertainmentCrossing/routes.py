@@ -2,16 +2,18 @@ from flask import (
 	render_template, redirect, url_for, 
 	flash, current_app, jsonify, request
 )
-from entertainmentCrossing.forms import EntertainerForm
+from entertainmentCrossing.forms import EntertainersForm
 import entertainmentCrossing.imdbCompare
 
 @current_app.route('/', methods=['POST'])
 def see_crossing():
 	try:
-		entertainer1 = request.form['entertainer1']
-		entertainer2 = request.form['entertainer2']
+		form = EntertainersForm()
+		if not form.validate_on_submit():
+			return jsonify(success=0, error_msg="the form request is invalid")
+		entertainers = [e["entertainer"] for e in form.entertainers.data]
 		compare_pages = entertainmentCrossing.imdbCompare.ComparePages()
-		overlap_dict = compare_pages.run_queries([entertainer1, entertainer2])
+		overlap_dict = compare_pages.run_queries(entertainers)
 		if overlap_dict.get('error_msg'):
 			overlap_dict["success"] = 0
 		else:
@@ -24,6 +26,6 @@ def see_crossing():
 	
 @current_app.route('/', methods=['GET'])
 def index():
-	form = EntertainerForm()
+	form = EntertainersForm()
 	return render_template('find_crossing.html', form=form)
 	
