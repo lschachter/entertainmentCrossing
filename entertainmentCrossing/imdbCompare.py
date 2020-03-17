@@ -1,41 +1,38 @@
-import re
-import requests
-from bs4 import BeautifulSoup
-from googlesearch import search
-
-
 class ComparePages:
 	'''
-	ComparePages will take multiple queries and search for the IMDb pages most related to them. If it successfully finds overlap in the filmographies found on those IMDb pages, it will return that overlap. Otherwise it will return the relevant error.
+	ComparePages will take multiple queries and search for the IMDb pages most related to them.
+	If it successfully finds overlap in the filmographies found on those IMDb pages,
+	it will return that overlap. Otherwise it will return the relevant error.
 	'''
-	def __init__(self, names={}):
-		self.entertainers = { name: "" for name in names }
-		self.error_dict = {}
-		self.title_dicts = []
+	def __init__(self, search_api, requests_api, scraper_api, regex_api):
+		self.search_api = search_api
+		self.requests_api = requests_api
+		self.scraper_api = scraper_api
+		self.regex_api = regex_api
+		self.links = []
+		self.entertainers = []
+		self.output = {}
 
 
 	def run_queries(self, names):
-		self.entertainers = { name: "" for name in names }
-		for name in self.entertainers:
-			self.entertainers[name] = self.get_url(name)
-
-		if self.error_dict: return self.error_dict
-		self.intersect = self.compare_filmographies()
-		if self.error_dict: return self.error_dict
-
-		output = self.build_output_dict()
-		return output
+		self.names = names
+		for name in self.names:
+			self.links.append(self.get_url(name))
+	
+		self.output['crossing'] = self.compare_filmographies()
+		self.output['entertainers'] = self.entertainers
+		return self.output
 
 
-	def get_url(self, query):
+	def get_url(self, name):
 		'''
 		Use Google's search API to return the first imdb url found
 		'''
-		query += " imdb"
-		for url in search(query, tld="com", num=10, stop=10, pause=1.0):
+		query = name + " imdb"
+		for url in self.search_api(query, tld="com", num=10, stop=10, pause=1.0):
 			if "imdb" in url and "name" in url:
 				return url
-		self.error_dict = {"error_msg": f'{query} did not yield an individual\'s imdb page to search. Please try again.'}
+		self.output["error_msg"] = f'"{name}" did not yield an individual\'s imdb page to search. Please try again.'
 		return ""
 
 
@@ -43,11 +40,18 @@ class ComparePages:
 		'''
 		Get and compare the filmographies of each entertainer entered
 		'''
-		for name in self.entertainers:
-			self.title_dicts.append(self.get_title_dict(name, self.entertainers[name]))
+		if self.output.get("error_msg"):
+			return {}
+			
+		title_dicts = []
+		num_entertainers = len(self.names)
+		for i in range(num_entertainers):
+			name, link = self.names[i], self.links[i]
+			title_dict = self.get_title_dict(name, link)
+			title_dicts.append(title_dict)
 
-		intersect_set = set.intersection(*map(set, self.title_dicts))
-		intersect_dict = { link: self.title_dicts[0][link] for link in intersect_set }
+		intersect_set = set.intersection(*map(set, title_dicts))
+		intersect_dict = { link: title_dicts[0][link] for link in intersect_set }
 		return intersect_dict
 
 
@@ -56,35 +60,41 @@ class ComparePages:
 		Use the `requests` and `BeautifulSoup` libraries to scrape the given IMDb page for a filmography section.
 		Use the `re` library to search the scraped content for the regular expression that points to the title section. 
 		'''
-		response = requests.get(link, timeout=15)
-		content = BeautifulSoup(response.content, "html.parser")
+		response = self.requests_api.get(link, timeout=15)
+		content = self.scraper_api(response.content, "html.parser")
 
 		filmography = content.find(id="filmography")
 		if not filmography:
-			self.error_dict = {"error_msg": f'the IMDb page <a href="{link}" target="_blank">{name}</a> did not yield a filmography to search. Please try again.'}
+			self.output["error_msg"] = f'the IMDb page <a href="{link}" target="_blank">{name}</a> did not yield a filmography to search. Please try again.'
 			return None
 
+		self.add_entertainer(content, link)
 		titles_pattern = "/title/.*"
-		titles = filmography.find_all('a', attrs={"href":re.compile(titles_pattern)})
+		titles = filmography.find_all('a', attrs={ "href": self.regex_api.compile(titles_pattern) })
 		title_dict = { a.get('href'): a.text for a in titles }
 		return title_dict
 
 
-	def build_output_dict(self):
-		output = {"crossing": self.intersect}
-		output["entertainers"] = []
-
-		for i, name in enumerate(self.entertainers):
-			output["entertainers"].append({ "name": name, "url": self.entertainers[name] })
-
-		return output
+	def add_entertainer(self, page_content, link):
+		# y'all, imdb source code is a mess
+		name_section = page_content.find(id="name-overview-widget")
+		official_name = name_section.find(class_="itemprop").get_text()
+		self.entertainers.append({ "name": official_name, "url": link })
 
 
 if __name__ == "__main__":
-	cp = ComparePages()
-	output = cp.run_queries(["cate blanchett", "elijah wood", "sean bean"])
+	'''
+	This function will become actual tests
+	'''
+	# dependencies
+	import re
+	import requests
+	from bs4 import BeautifulSoup
+	from googlesearch import search
+	cp = ComparePages(search, requests, BeautifulSoup, re)
+	output = cp.run_queries(["cate blanchett", "elijah wood"]) # , "sean bean"
 	print('crossing: ')
 	for item in output['crossing']:
 		print(item, output['crossing'][item])
-	for name in output['entertainers']:
-		print(name, output['entertainers'][name])
+	for person in output['entertainers']:
+		print(person['name'], person['url'])

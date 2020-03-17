@@ -1,9 +1,14 @@
 from flask import (
-	render_template, redirect, url_for, 
-	flash, current_app, jsonify, request
+	render_template, redirect, url_for, flash, current_app, jsonify, request
 )
 from entertainmentCrossing.forms import EntertainersForm
 import entertainmentCrossing.imdbCompare
+
+# dependencies
+import re
+import requests
+from bs4 import BeautifulSoup
+from googlesearch import search
 
 @current_app.route('/', methods=['POST'])
 def see_crossing():
@@ -12,7 +17,7 @@ def see_crossing():
 		if not form.validate_on_submit():
 			return jsonify(success=0, error_msg="the form request is invalid")
 		entertainers = [e["entertainer"] for e in form.entertainers.data]
-		compare_pages = entertainmentCrossing.imdbCompare.ComparePages()
+		compare_pages = entertainmentCrossing.imdbCompare.ComparePages(search, requests, BeautifulSoup, re)
 		overlap_dict = compare_pages.run_queries(entertainers)
 		if overlap_dict.get('error_msg'):
 			overlap_dict["success"] = 0

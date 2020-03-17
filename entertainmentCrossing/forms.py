@@ -9,7 +9,9 @@ class EntertainerForm(Form):
 
 
 class EntertainersForm(FlaskForm):
-	"""Parent form with dynamic # of entertainers"""
+	"""
+	Parent form with dynamic # of entertainers
+	"""
 	entertainers = FieldList(
 		FormField(EntertainerForm),
 		min_entries=2,
