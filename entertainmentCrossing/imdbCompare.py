@@ -4,11 +4,11 @@ class ComparePages:
 	If it successfully finds overlap in the filmographies found on those IMDb pages,
 	it will return that overlap. Otherwise it will return the relevant error.
 	'''
-	def __init__(self, search_api, requests_api, scraper_api, regex_api):
+	def __init__(self, search_api, requests_api, scraper_lib, regex_lib):
 		self.search_api = search_api
 		self.requests_api = requests_api
-		self.scraper_api = scraper_api
-		self.regex_api = regex_api
+		self.scraper_lib = scraper_lib
+		self.regex_lib = regex_lib
 		self.links = []
 		self.entertainers = []
 		self.output = {}
@@ -18,7 +18,7 @@ class ComparePages:
 		self.names = names
 		for name in self.names:
 			self.links.append(self.get_url(name))
-	
+
 		self.output['crossing'] = self.compare_filmographies()
 		self.output['entertainers'] = self.entertainers
 		return self.output
@@ -42,12 +42,11 @@ class ComparePages:
 		'''
 		if self.output.get("error_msg"):
 			return {}
-			
+
 		title_dicts = []
 		num_entertainers = len(self.names)
 		for i in range(num_entertainers):
-			name, link = self.names[i], self.links[i]
-			title_dict = self.get_title_dict(name, link)
+			title_dict = self.get_title_dict(self.names[i], self.links[i])
 			title_dicts.append(title_dict)
 
 		intersect_set = set.intersection(*map(set, title_dicts))
@@ -61,16 +60,16 @@ class ComparePages:
 		Use the `re` library to search the scraped content for the regular expression that points to the title section. 
 		'''
 		response = self.requests_api.get(link, timeout=15)
-		content = self.scraper_api(response.content, "html.parser")
+		content = self.scraper_lib(response.content, "html.parser")
 
 		filmography = content.find(id="filmography")
 		if not filmography:
-			self.output["error_msg"] = f'the IMDb page <a href="{link}" target="_blank">{name}</a> did not yield a filmography to search. Please try again.'
+			self.output["error_msg"] = f'the IMDb page "<a href="{link}" target="_blank">{name}</a>" did not yield a filmography to search. Please try again.'
 			return None
 
 		self.add_entertainer(content, link)
 		titles_pattern = "/title/.*"
-		titles = filmography.find_all('a', attrs={ "href": self.regex_api.compile(titles_pattern) })
+		titles = filmography.find_all('a', attrs={ "href": self.regex_lib.compile(titles_pattern) })
 		title_dict = { a.get('href'): a.text for a in titles }
 		return title_dict
 
@@ -80,21 +79,3 @@ class ComparePages:
 		name_section = page_content.find(id="name-overview-widget")
 		official_name = name_section.find(class_="itemprop").get_text()
 		self.entertainers.append({ "name": official_name, "url": link })
-
-
-if __name__ == "__main__":
-	'''
-	This function will become actual tests
-	'''
-	# dependencies
-	import re
-	import requests
-	from bs4 import BeautifulSoup
-	from googlesearch import search
-	cp = ComparePages(search, requests, BeautifulSoup, re)
-	output = cp.run_queries(["cate blanchett", "elijah wood"]) # , "sean bean"
-	print('crossing: ')
-	for item in output['crossing']:
-		print(item, output['crossing'][item])
-	for person in output['entertainers']:
-		print(person['name'], person['url'])

@@ -7,10 +7,10 @@ $(function() {
       success: function(response) {
         $(".processing-overlay").hide();
 		$("#results").empty();
-		$('#entertainer-links').empty();
         $(".results-section").show();
         if (response['success'] === 0) {
 		  console.log(response);
+		  $('#entertainer-links').empty();
           $('#results').append('<p>Sorry, ' + response['error_msg'] + '</p>');
         } else {
           let people = '';
@@ -26,7 +26,7 @@ $(function() {
             }
           }
           $('#entertainer-links').html(people);
-          const imdb = "https://www.imdb.com/";
+          const imdb = "https://www.imdb.com";
           $.each(response['crossing'], function(url, title) {
             $('#results').append('<a class="col-sm-6" target="_blank" href="' + imdb + url + '">' + title + '</a>');
           });

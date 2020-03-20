@@ -1,0 +1,8 @@
+version: '3'
+services:
+  web:
+    build: .
+    environment:
+      - EC_SECRET_KEY=$EC_SECRET_KEY
+    ports:
+      - "5000:5000"
