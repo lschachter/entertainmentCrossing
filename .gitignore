@@ -130,3 +130,7 @@ dmypy.json
 
 # VSCode 
 .vscode/
+
+# AWS/items with AWS info (only share local docker-compose with public)
+ecs-params.yml
+docker-compose.yml
