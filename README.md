@@ -14,7 +14,7 @@ Entertainment Crossing is a single page web app built using Flask, jQuery, the P
 
 _**NOTE** There is an `entertainmentCrossing` folder (package) **within** the `entertainmentCrossing` folder you cloned. This is a Flask-recommended set up. You want to be in the **outer** `entertainmentCrossing` folder for all commands instructed here._
 
-I use [docker](https://www.docker.com/products/docker-desktop) to build my site. My `docker-compose` file contains deployment information, but my file for local spinning up, `local-compose.yml` does not. So, if you choose to use docker with this project, you can it with
+I use [docker](https://www.docker.com/products/docker-desktop) to build my site. My `docker-compose` file contains (private) deployment information so I haven't included it, but my file for spinning up locally, `local-compose.yml` does not. So, if you choose to use docker with this project, you can run it with
 
 ```
 docker-compose -f local-compose.yml up --build
@@ -46,6 +46,8 @@ In the future I plan to add to the site in various ways:
 - Add robust testing
 - Cache recent queries (those made by the user and those found by google, to avoid IMDb scraping even if the user put in a slightly different query looking for the same person)
 - If the site actually gets used, I would like to remove the scraping of IMDb and instead create a cron job that downloads their database periodically, searching through that for the crossings instead of the site itself. This would speed up the site immensely but cost money to host, so would only be worthwhile down the line.
+- Rewrite the logic into an api
+- Rewrite the frontend using React
 
 ##### Functionality
 
